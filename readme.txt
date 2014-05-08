@@ -38,6 +38,10 @@ TAO Scheduled change is a really small plugin. It only does one thing, but tries
 
 == Changelog ==
 
+= 1.01 =
+
+* Readme update
+
 = 1.0 =
 
 * The Initial Release
