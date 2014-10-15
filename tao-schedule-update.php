@@ -4,7 +4,7 @@
  * Description: Allows you to plan changes on any post type
  * Author: TAO Software
  * Author URI: http://software.tao.at
- * Version: 1.0
+ * Version: 1.02
  * License: MIT
  */
 
@@ -103,8 +103,8 @@ class TAO_ScheduleUpdate {
 	public static function display_post_states( $states ) {
 		global $post;
 		$arg = get_query_var('post_status');
-
-		$type = self::get_post_types()[$post->post_type];
+		$the_post_types = self::get_post_types();
+		$type = $the_post_types[$post->post_type];
 
 		if ( $arg != self::$TAO_PUBLISH_LABEL && $post->post_status == self::$TAO_PUBLISH_STATUS ) {
 			$states = array( self::$TAO_PUBLISH_LABEL );
