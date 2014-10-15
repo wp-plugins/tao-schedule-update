@@ -35,6 +35,9 @@ TAO Scheduled change is a really small plugin. It only does one thing, but tries
 2. Activate the plugin through the 'Plugins' menu in WordPress
 3. No 3rd step neccessary
 
+== Screenshots ==
+
+1. The Plugin in Action
 
 == Changelog ==
 
