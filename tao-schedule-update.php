@@ -104,6 +104,8 @@ class TAO_ScheduleUpdate {
 		global $post;
 		$arg = get_query_var('post_status');
 		$the_post_types = self::get_post_types();
+		// default states for non public posts
+		if( !isset($the_post_types[$post->post_type]) ) return $states;
 		$type = $the_post_types[$post->post_type];
 
 		if ( $arg != self::$TAO_PUBLISH_LABEL && $post->post_status == self::$TAO_PUBLISH_STATUS ) {
