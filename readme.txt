@@ -41,7 +41,7 @@ TAO Scheduled change is a really small plugin. It only does one thing, but tries
 
 == Changelog ==
 
-= 1.03 =
+= 1.02.01 =
 
 * fix scheduled posts appearing in search
 * fix problems with l10n textdomain
