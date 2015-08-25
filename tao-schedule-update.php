@@ -4,7 +4,7 @@
  * Description: Allows you to plan changes on any post type
  * Author: TAO Software
  * Author URI: http://software.tao.at
- * Version: 1.04
+ * Version: 1.05
  * License: MIT
  */
 
@@ -432,14 +432,16 @@ class TAO_ScheduleUpdate {
 		//abort if any of the ids is not a post
 		if( !$source_post || !$destination_post ) return;
 
-		//remove all meta from the destination, 
-		$dest_keys = get_post_custom_keys( $destination_post->ID );
+		/* remove all meta from the destination, 
+		 * initialize to emptyarray if not set to prevent error in foreach loop
+		 */
+		$dest_keys = get_post_custom_keys( $destination_post->ID ) ?: array();
 		foreach( $dest_keys as $key ) {
 			delete_post_meta( $destination_post->ID, $key );
 		}
 
 		//now for copying the metadata to the new post
-		$meta_keys = get_post_custom_keys( $source_post->ID ); 
+		$meta_keys = get_post_custom_keys( $source_post->ID ) ?: array(); 
 		foreach ( $meta_keys as $key ) {
 			$meta_values = get_post_custom_values( $key, $source_post->ID );
 			foreach ( $meta_values as $value ) {
@@ -506,7 +508,14 @@ class TAO_ScheduleUpdate {
 	 * @return int the original post's id
 	 */
 	public static function publish_post( $post_id ) {
-		$orig = get_post( get_post_meta( $post_id, self::$TAO_PUBLISH_STATUS . '_original', true ) );
+
+		$orig_id = get_post_meta( $post_id, self::$TAO_PUBLISH_STATUS . '_original', true );
+		//break early if given post is not an actual scheduled post created by this plugin
+		if( !$orig_id ) {
+			return $post_id;
+		}
+
+		$orig = get_post( $orig_id );
 
 		$post = get_post( $post_id );
 
@@ -528,6 +537,19 @@ class TAO_ScheduleUpdate {
 		return $orig->ID;
 	}
 
+	/**
+	 * Wrapper function for cron automated publishing
+	 * disables the kses filters before and reenables them after the post has been published
+	 *
+	 * @param int $post_id the post's id
+	 * @return void
+	 */
+	public static function cron_publish_post( $post_id ) {
+		kses_remove_filters();
+		self::publish_post( $post_id );
+		kses_init_filters();
+	}
+
 
 	/**
 	 * Reformats a timestamp into human readable publishing date and time
@@ -546,7 +568,7 @@ class TAO_ScheduleUpdate {
 }
 
 add_action( 'save_post', create_function( '$post_id, $post', 'return TAO_ScheduleUpdate::save_meta( $post_id, $post );' ), 10, 2 );
-add_action( 'tao_publish_post', create_function( '$post_id', 'return TAO_ScheduleUpdate::publish_post( $post_id );' ) );
+add_action( 'tao_publish_post', create_function( '$post_id', 'return TAO_ScheduleUpdate::cron_publish_post( $post_id );' ) );
 
 add_action( 'wp_ajax_load_pubdate', create_function( '', 'return TAO_ScheduleUpdate::load_pubdate();' ) );
 add_action( 'init', create_function( '', 'return TAO_ScheduleUpdate::init();' ) );
